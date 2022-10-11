@@ -1,18 +1,20 @@
 #include <conio.h> //sleep
 
 #include <iostream> //console
+
 #include <vector>
 #include <string>
 #include <chrono> //time
 
-//#include <limits>
+#include <algorithm>
 
 #define KEY_UP 72
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 #define KEY_DOWN 80
 
-// using namespace std;
+#define ARENA_WIDTH 64
+#define ARENA_HEIGHT 16
 
 class Cords
 {
@@ -26,6 +28,12 @@ public:
         this->x = x;
         this->y = y;
     }
+
+public:
+    std::string getUID()
+    {
+        return std::to_string(this->x) + "_" + std::to_string(this->y);
+    }
 };
 
 class Snake
@@ -38,54 +46,128 @@ public:
     short signed int directionY = 0;
 
 public:
-    std::vector<Cords> history = {
-        Cords(5, 4),
-        Cords(6, 4),
-        Cords(7, 4),
+    Cords snack = Cords(0, 0);
+
+public:
+    std::vector<Cords>
+        history = {
+            Cords(5, 4),
+            Cords(6, 4),
+            Cords(7, 4),
     };
 
 public:
     void debug()
     {
         std::cout << "direction:" << std::endl;
-        std::cout << "\tx:" << directionX << std::endl;
-        std::cout << "\ty:" << directionY << std::endl;
-        std::cout << "History:" << std::endl;
-        for (Cords c : history)
-        {
-            std::cout << "\tx:" << c.x << std::endl;
-            std::cout << "\ty:" << c.y << std::endl;
-            std::cout << "\t------" << std::endl;
-        }
+        std::cout << "\tx:" << this->directionX << std::endl;
+        std::cout << "\ty:" << this->directionY << std::endl;
+        std::cout << "------" << std::endl;
+        std::cout << "snack:" << std::endl;
+        std::cout << "\tx:" << this->snack.x << std::endl;
+        std::cout << "\ty:" << this->snack.y << std::endl;
+        std::cout << "------" << std::endl;
+        // std::cout << "History:" << std::endl;
+        // for (Cords c : this->history)
+        //{
+        //     std::cout << "\tx:" << c.x << std::endl;
+        //     std::cout << "\ty:" << c.y << std::endl;
+        //     std::cout << "\t------" << std::endl;
+        // }
     }
 };
 
-char getBorder(int x, int y, int width, int height)
+Cords generateSnack(Snake snake)
 {
-    if (x == 0 && y == 0)
+    Cords snack = Cords(
+        (rand() % (ARENA_WIDTH - 1)) + 2,
+        (rand() % (ARENA_HEIGHT - 1)) + 2);
+
+    for (Cords h : snake.history)
+    {
+        if (snack.x == h.x || snack.y == h.y)
+        {
+            return generateSnack(snake);
+        }
+    }
+    return snack;
+}
+
+char getBorder(int x, int y)
+{
+    if (x == 1 && y == 1)
         return 201; //╔
-    if (x == width - 1 && y == height - 1)
+    if (x == ARENA_WIDTH && y == ARENA_HEIGHT)
         return 188; //╝
-    if (x == width - 1 && y == 0)
+    if (x == ARENA_WIDTH && y == 1)
         return 187; //╗
-    if (x == 0 && y == height - 1)
+    if (x == 1 && y == ARENA_HEIGHT)
         return 200; //╚
-    if (x == 0 || x == width - 1)
+    if (x == 1 || x == ARENA_WIDTH)
         return 186; //║
-    if (y == 0 || y == height - 1)
+    if (y == 1 || y == ARENA_HEIGHT)
         return 205; //═
     return 32;
 }
 
-void moveSnake(Snake *snake)
+bool isSelfCrash(Snake snake)
 {
-    snake->history.erase(snake->history.begin());
-    snake->history.push_back(Cords(
-        snake->history.back().x + snake->directionX,
-        snake->history.back().y + snake->directionY));
+    std::vector<Cords> snakePos = snake.history;
+    std::sort(snakePos.begin(), snakePos.end(), [](Cords lsp, Cords rsp)
+              { return lsp.getUID() < rsp.getUID(); });
+
+    for (int i = 0; i < snakePos.size() - 1; i++)
+    {
+        if (snakePos[i].x == snakePos[i + 1].x && snakePos[i].y == snakePos[i + 1].y)
+            return true;
+    }
+
+    return false;
 }
 
-bool isSnake(int x, int y, Snake snake)
+bool isBorderCrash(Snake snake)
+{
+    Cords head = snake.history.back();
+
+    if (head.x == 1 || head.y == 1 || head.x == ARENA_WIDTH || head.y == ARENA_HEIGHT)
+        return true;
+
+    return false;
+}
+
+bool isSnackCrash(Snake snake)
+{
+    Cords head = snake.history.back();
+
+    if (head.x == snake.snack.x && head.y == snake.snack.y)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool moveSnake(Snake *snake)
+{
+    snake->history.push_back(Cords(snake->history.back().x + snake->directionX, snake->history.back().y + snake->directionY));
+    if (isSnackCrash(*snake))
+    {
+        snake->snack = generateSnack(*snake);
+    }
+    else
+    {
+        snake->history.erase(snake->history.begin());
+    }
+    if (isSelfCrash(*snake) || isBorderCrash(*snake))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool isSnakePixel(int x, int y, Snake snake)
 {
     for (Cords c : snake.history)
     {
@@ -95,50 +177,72 @@ bool isSnake(int x, int y, Snake snake)
     return false;
 }
 
-void drawArena(int height, int width, Snake snake)
+void drawArena(Snake snake)
 {
-    for (int y = 0; y < height; ++y)
+    char arena[(ARENA_HEIGHT * ARENA_WIDTH) + ARENA_HEIGHT];
+    unsigned int arenaIndex = 0;
+    for (int y = 1; y <= ARENA_HEIGHT; ++y)
     {
-        for (int x = 0; x < width; ++x)
+        for (int x = 1; x <= ARENA_WIDTH; ++x)
         {
-            char border = getBorder(x, y, width, height);
+            char border = getBorder(x, y);
             if (border != 32)
             {
-                std::cout << border;
+                arena[arenaIndex] = border;
             }
-            else if (isSnake(x, y, snake))
+            else if (isSnakePixel(x, y, snake))
             {
-                std::cout << char(169);
+                arena[arenaIndex] = char(169);
+            }
+            else if (snake.snack.x == x && snake.snack.y == y)
+            {
+                arena[arenaIndex] = char(43);
             }
             else
             {
-                std::cout << char(32);
+                arena[arenaIndex] = char('-');
             }
+            arenaIndex++;
         }
-        std::cout << std::endl;
+        arena[arenaIndex] = char(10);
+        arenaIndex++;
     }
+
+    std::cout << arena << std::flush;
 }
 
 void handleInput(Snake *snake)
 {
     int c = 0;
-    switch ((c = getch()))
+    switch ((c = _getch()))
     {
     case KEY_UP:
-        snake->directionY = -1;
-        snake->directionX = 0;
+        if (snake->directionY != 1)
+        {
+            snake->directionY = -1;
+            snake->directionX = 0;
+        }
         break;
     case KEY_DOWN:
-        snake->directionY = 1;
-        snake->directionX = 0;
+        if (snake->directionY != -1)
+        {
+            snake->directionY = 1;
+            snake->directionX = 0;
+        }
         break;
     case KEY_LEFT:
-        snake->directionX = -1;
-        snake->directionY = 0;
+        if (snake->directionX != 1)
+        {
+            snake->directionX = -1;
+            snake->directionY = 0;
+        }
         break;
     case KEY_RIGHT:
-        snake->directionX = 1;
-        snake->directionY = 0;
+        if (snake->directionX != -1)
+        {
+            snake->directionX = 1;
+            snake->directionY = 0;
+        }
         break;
     }
 }
@@ -152,14 +256,18 @@ int main()
 {
 
     Snake snake;
-    unsigned int gameTick = 500;
+    snake.snack = generateSnack(snake);
+
+    unsigned int gameTick = 300;
 
     unsigned long long int lastTime, thisTime;
     lastTime = getTime();
 
-    while (true)
+    bool running = true;
+
+    while (running)
     {
-        if (kbhit())
+        if (_kbhit())
         {
             handleInput(&snake);
         }
@@ -168,12 +276,20 @@ int main()
         {
             lastTime = thisTime;
 
-            moveSnake(&snake);
-            // printf("\033c");
-            drawArena(16, 64, snake);
-            snake.debug();
+            if (!moveSnake(&snake))
+                break;
+
+            system("cls");
+
+            drawArena(snake);
+
+            //snake.debug();
         }
     }
+
+    std::string exit;
+    std::cout << "Exit";
+    std::getline(std::cin, exit);
 
     return 0;
 }

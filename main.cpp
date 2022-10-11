@@ -3,10 +3,7 @@
 #include <iostream> //console
 #include <vector>
 #include <string>
-//#include <future>
 #include <chrono> //time
-
-#include <thread> //thread
 
 //#include <limits>
 
@@ -14,6 +11,8 @@
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 #define KEY_DOWN 80
+
+// using namespace std;
 
 class Cords
 {
@@ -98,7 +97,6 @@ bool isSnake(int x, int y, Snake snake)
 
 void drawArena(int height, int width, Snake snake)
 {
-
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
@@ -161,7 +159,8 @@ int main()
 
     while (true)
     {
-        if(kbhit()){
+        if (kbhit())
+        {
             handleInput(&snake);
         }
         thisTime = getTime();
@@ -170,10 +169,9 @@ int main()
             lastTime = thisTime;
 
             moveSnake(&snake);
-            printf("\033c");
+            // printf("\033c");
             drawArena(16, 64, snake);
             snake.debug();
-            //std::this_thread::sleep_for(std::chrono::milliseconds(gameTick));
         }
     }
 

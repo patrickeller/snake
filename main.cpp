@@ -8,13 +8,16 @@
 
 #include <algorithm>
 
+#include <windows.h>
+#include <cwchar>
+
 #define KEY_UP 72
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 #define KEY_DOWN 80
 
 #define ARENA_WIDTH 64
-#define ARENA_HEIGHT 16
+#define ARENA_HEIGHT 48
 
 class Cords
 {
@@ -192,7 +195,7 @@ void drawArena(Snake snake)
             }
             else if (isSnakePixel(x, y, snake))
             {
-                arena[arenaIndex] = char(169);
+                arena[arenaIndex] = char(35);
             }
             else if (snake.snack.x == x && snake.snack.y == y)
             {
@@ -200,7 +203,7 @@ void drawArena(Snake snake)
             }
             else
             {
-                arena[arenaIndex] = char('-');
+                arena[arenaIndex] = char(32);
             }
             arenaIndex++;
         }
@@ -252,13 +255,27 @@ unsigned long long int getTime()
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
+void consoleInit()
+{
+    HANDLE Hout = ::GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_FONT_INFOEX Font = {sizeof(Font)};
+    ::GetCurrentConsoleFontEx(Hout, FALSE, &Font);
+    Font.dwFontSize={28,28};
+    SetCurrentConsoleFontEx(Hout,0,&Font);
+
+    HWND hWnd = GetConsoleWindow();
+    ShowWindow(hWnd, SW_SHOWMAXIMIZED);
+}
+
 int main()
 {
+
+    consoleInit();
 
     Snake snake;
     snake.snack = generateSnack(snake);
 
-    unsigned int gameTick = 300;
+    unsigned int gameTick = 100;
 
     unsigned long long int lastTime, thisTime;
     lastTime = getTime();
@@ -282,13 +299,14 @@ int main()
             system("cls");
 
             drawArena(snake);
+            std::cout << "Punktzahl: " << snake.history.size() - 3<<std::endl;
 
-            //snake.debug();
+            // snake.debug();
         }
     }
 
     std::string exit;
-    std::cout << "Exit";
+    std::cout << "GAME OVER!!!";
     std::getline(std::cin, exit);
 
     return 0;

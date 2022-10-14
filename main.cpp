@@ -16,8 +16,15 @@
 #define KEY_RIGHT 77
 #define KEY_DOWN 80
 
-#define ARENA_WIDTH 64
-#define ARENA_HEIGHT 48
+#define ARENA_WIDTH 32
+#define ARENA_HEIGHT 20
+
+
+//______________________
+
+//#include "./drawer.cpp"
+
+//______________________
 
 class Cords
 {
@@ -83,8 +90,8 @@ public:
 Cords generateSnack(Snake snake)
 {
     Cords snack = Cords(
-        (rand() % (ARENA_WIDTH - 1)) + 2,
-        (rand() % (ARENA_HEIGHT - 1)) + 2);
+        (rand() % (ARENA_WIDTH - 1)) + 1,
+        (rand() % (ARENA_HEIGHT - 1)) + 1);
 
     for (Cords h : snake.history)
     {
@@ -217,31 +224,35 @@ void drawArena(Snake snake)
 void handleInput(Snake *snake)
 {
     int c = 0;
+
+    int xOffset = snake->history.end()[-1].x - snake->history.end()[-2].x;
+    int yOffset = snake->history.end()[-1].y - snake->history.end()[-2].y;
+
     switch ((c = _getch()))
     {
     case KEY_UP:
-        if (snake->directionY != 1)
+        if (yOffset != 1)
         {
             snake->directionY = -1;
             snake->directionX = 0;
         }
         break;
     case KEY_DOWN:
-        if (snake->directionY != -1)
+        if (yOffset != -1)
         {
             snake->directionY = 1;
             snake->directionX = 0;
         }
         break;
     case KEY_LEFT:
-        if (snake->directionX != 1)
+        if (xOffset != 1)
         {
             snake->directionX = -1;
             snake->directionY = 0;
         }
         break;
     case KEY_RIGHT:
-        if (snake->directionX != -1)
+        if (xOffset != -1)
         {
             snake->directionX = 1;
             snake->directionY = 0;
@@ -301,13 +312,16 @@ int main()
             drawArena(snake);
             std::cout << "Punktzahl: " << snake.history.size() - 3<<std::endl;
 
-            // snake.debug();
+            //snake.debug();
         }
     }
+
 
     std::string exit;
     std::cout << "GAME OVER!!!";
     std::getline(std::cin, exit);
+
+    main();
 
     return 0;
 }

@@ -4,8 +4,7 @@
             "name": "Win64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:\\cpp_libraries\\wxWidgets-3.2.1\\include",
-                "C:\\cpp_libraries\\wxWidgets-3.2.1\\include\\msvc"
+                "C:\\cpp_libraries\\wxWidgets-3.2.1\\include"
             ],
             "defines": [
                 "_DEBUG",
@@ -13,10 +12,10 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe",
+            "compilerPath": "C:/mingw64/bin/g++.exe",
             "cStandard": "c17",
             "cppStandard": "c++20",
-            "intelliSenseMode": "windows-msvc-x64"
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

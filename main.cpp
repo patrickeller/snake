@@ -12,8 +12,8 @@
 //#include <cwchar>
 //
 //
-//#include <wx/wx.h>
-//
+//#include "Position.hpp"
+//#include "Snake.hpp"
 //
 //#define KEY_UP 72
 //#define KEY_LEFT 75
@@ -24,82 +24,13 @@
 //#define ARENA_HEIGHT 20
 //
 //
-////______________________
-//
-////#include "./drawer.cpp"
-//
-////______________________
-//
-//
-//
-//class Cords
+//Position generateSnack(Snake snake)
 //{
-//
-//public:
-//    unsigned int x, y;
-//
-//public:
-//    Cords(int x, int y)
-//    {
-//        this->x = x;
-//        this->y = y;
-//    }
-//
-//public:
-//    std::string getUID()
-//    {
-//        return std::to_string(this->x) + "_" + std::to_string(this->y);
-//    }
-//};
-//
-//class Snake
-//{
-//
-//public:
-//    short signed int directionX = 1;
-//
-//public:
-//    short signed int directionY = 0;
-//
-//public:
-//    Cords snack = Cords(0, 0);
-//
-//public:
-//    std::vector<Cords>
-//        history = {
-//            Cords(5, 4),
-//            Cords(6, 4),
-//            Cords(7, 4),
-//    };
-//
-//public:
-//    void debug()
-//    {
-//        std::cout << "direction:" << std::endl;
-//        std::cout << "\tx:" << this->directionX << std::endl;
-//        std::cout << "\ty:" << this->directionY << std::endl;
-//        std::cout << "------" << std::endl;
-//        std::cout << "snack:" << std::endl;
-//        std::cout << "\tx:" << this->snack.x << std::endl;
-//        std::cout << "\ty:" << this->snack.y << std::endl;
-//        std::cout << "------" << std::endl;
-//        // std::cout << "History:" << std::endl;
-//        // for (Cords c : this->history)
-//        //{
-//        //     std::cout << "\tx:" << c.x << std::endl;
-//        //     std::cout << "\ty:" << c.y << std::endl;
-//        //     std::cout << "\t------" << std::endl;
-//        // }
-//    }
-//};
-//
-//Cords generateSnack(Snake snake)
-//{
-//    Cords snack = Cords(
+//    Position snack = Position(
 //        (rand() % (ARENA_WIDTH - 1)) + 1,
 //        (rand() % (ARENA_HEIGHT - 1)) + 1);
 //
-//    for (Cords h : snake.history)
+//    for (Position h : snake.history)
 //    {
 //        if (snack.x == h.x || snack.y == h.y)
 //        {
@@ -128,8 +59,8 @@
 //
 //bool isSelfCrash(Snake snake)
 //{
-//    std::vector<Cords> snakePos = snake.history;
-//    std::sort(snakePos.begin(), snakePos.end(), [](Cords lsp, Cords rsp)
+//    std::vector<Position> snakePos = snake.history;
+//    std::sort(snakePos.begin(), snakePos.end(), [](Position lsp, Position rsp)
 //              { return lsp.getUID() < rsp.getUID(); });
 //
 //    for (int i = 0; i < snakePos.size() - 1; i++)
@@ -143,7 +74,7 @@
 //
 //bool isBorderCrash(Snake snake)
 //{
-//    Cords head = snake.history.back();
+//    Position head = snake.history.back();
 //
 //    if (head.x == 1 || head.y == 1 || head.x == ARENA_WIDTH || head.y == ARENA_HEIGHT)
 //        return true;
@@ -153,7 +84,7 @@
 //
 //bool isSnackCrash(Snake snake)
 //{
-//    Cords head = snake.history.back();
+//    Position head = snake.history.back();
 //
 //    if (head.x == snake.snack.x && head.y == snake.snack.y)
 //    {
@@ -167,7 +98,7 @@
 //
 //bool moveSnake(Snake *snake)
 //{
-//    snake->history.push_back(Cords(snake->history.back().x + snake->directionX, snake->history.back().y + snake->directionY));
+//    snake->history.push_back(Position(snake->history.back().x + snake->directionX, snake->history.back().y + snake->directionY));
 //    if (isSnackCrash(*snake))
 //    {
 //        snake->snack = generateSnack(*snake);
@@ -185,7 +116,7 @@
 //
 //bool isSnakePixel(int x, int y, Snake snake)
 //{
-//    for (Cords c : snake.history)
+//    for (Position c : snake.history)
 //    {
 //        if (x == c.x && y == c.y)
 //            return true;

@@ -2,25 +2,34 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build and execute",
-      		"dependsOn": ["Build GCC", "Run EXE"],
+			"label": "Kill and Build",
+      		"dependsOn": ["Kill Process", "Build GCC"],
 			"dependsOrder": "sequence"
 		},
 		{
 			"type": "cppbuild",
-			"label": "Run EXE",
-			"command": ".\\main.exe",
-			"args": [],
+			"label": "Kill Process",
+			"command": "taskkill",
+			"args": [
+				"/T",
+				"/IM",
+				"main.exe",
+				"2>NUL",
+				">NUL",
+				"/FI", 
+				"\"STATUS eq RUNNING\""
+			],
+			"problemMatcher": [],
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
 			"group": "build",
-			"detail": "exectue main.exe"
+			"detail": "Kill running Process"
 		},
 		{
 			"type": "cppbuild",
 			"label": "Build GCC",
-			"command": "C:\\mingw64\\bin\\g++.exe",
+			"command": "g++.exe",
 			"args": [
 				"-IC:\\cpp_libraries\\wxWidgets-3.2.1\\include",
 				"-LC:\\cpp_libraries\\wxWidgets-3.2.1\\lib\\gcc_dll",
@@ -28,21 +37,23 @@
 				"-std=c++20",
 				"${workspaceFolder}\\*.cpp",
 				"-lwxbase32u",
-				"-lwxbase32u_net",
-				"-lwxbase32u_xml",
-				"-lwxmsw32u_adv",
-				"-lwxmsw32u_aui",
 				"-lwxmsw32u_core",
-				"-lwxmsw32u_gl",
-				"-lwxmsw32u_html",
-				"-lwxmsw32u_media",
-				"-lwxmsw32u_propgrid",
-				"-lwxmsw32u_ribbon",
-				"-lwxmsw32u_richtext",
-				"-lwxmsw32u_stc",
-				"-lwxmsw32u_webview",
-				"-lwxmsw32u_xrc",
-				"-o ${workspaceFolder}\\main.exe",
+				//"-lwxbase32u_net",
+				//"-lwxbase32u_xml",
+				//"-lwxmsw32u_adv",
+				//"-lwxmsw32u_aui",
+				//"-lwxmsw32u_gl",
+				//"-lwxmsw32u_html",
+				//"-lwxmsw32u_media",
+				//"-lwxmsw32u_propgrid",
+				//"-lwxmsw32u_ribbon",
+				//"-lwxmsw32u_richtext",
+				//"-lwxmsw32u_stc",
+				//"-lwxmsw32u_webview",
+				//"-lwxmsw32u_xrc",
+				"-mwindows",
+				"-o",
+				"${workspaceFolder}\\dist\\main.exe",
 			],
 			"options": {
 				"cwd": "${fileDirname}"
@@ -52,6 +63,22 @@
 			],
 			"group": "build",
 			"detail": "compiler: C:\\mingw64\\bin\\g++.exe"
+		},
+		{
+			"label": "Build and execute",
+      		"dependsOn": ["Build GCC", "Run EXE"],
+			"dependsOrder": "sequence"
+		},
+		{
+			"type": "cppbuild",
+			"label": "Run EXE",
+			"command": ".\\dist\\main.exe",
+			"args": [],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"detail": "exectue main.exe"
 		},
 		{
 			"type": "cppbuild",

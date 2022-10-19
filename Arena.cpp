@@ -1,3 +1,6 @@
+#include <string>
+#include <iostream>
+
 #include "config.cpp"
 
 #include "Arena.hpp"
@@ -31,7 +34,7 @@ bool Arena::isSnakePixel(int x, int y, Snake snake)
     return false;
 }
 
-void Arena::drawArena(Snake snake)
+std::string Arena::drawArena(Snake snake)
 {
     char arena[(ARENA_HEIGHT * ARENA_WIDTH) + ARENA_HEIGHT];
     unsigned int arenaIndex = 0;
@@ -62,5 +65,8 @@ void Arena::drawArena(Snake snake)
         arenaIndex++;
     }
 
-    // std::cout << arena << std::flush;
+    std::cout << arena;
+
+    std::string arenaString = arena;
+    return arenaString;
 }

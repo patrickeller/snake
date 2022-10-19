@@ -56,7 +56,7 @@
 				//"-lwxmsw32u_stc",
 				//"-lwxmsw32u_webview",
 				//"-lwxmsw32u_xrc",
-				"-mwindows",
+				//"-mwindows",
 				"-o",
 				"${workspaceFolder}\\dist\\main.exe",
 			],

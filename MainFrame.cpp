@@ -12,9 +12,10 @@ MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
 
     panel->Bind(wxEVT_CHAR_HOOK, &MainFrame::OnKeyEvent, this);
 
-    SetFont(wxFont(32, wxFONTFAMILY_SCRIPT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+    SetFont(wxFont(16, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-    arenaOutput = new wxStaticText(this, wxID_ANY, "Example Text", wxPoint(0,0), wxSize(200, 200), wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+    arenaOutput = new wxStaticText(this, wxID_ANY, "Example Text", wxPoint(0,0), wxSize(800, 800), wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+    arenaOutput->IsDoubleBuffered();
 
     CreateStatusBar();
 
@@ -28,9 +29,12 @@ MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
 
 void MainFrame::OnTick(wxTimerEvent &evt)
 {
-    if (!snake.moveSnake())
+    if (!snake.moveSnake()){
         timer->Stop();
-    Arena::drawArena(snake);
+    }else{
+        wxString arenaString(Arena::drawArena(snake).c_str(), wxConvWhateverWorks);
+        arenaOutput->SetLabel(arenaString);
+    }
 }
 
 void MainFrame::OnKeyEvent(wxKeyEvent &evt)

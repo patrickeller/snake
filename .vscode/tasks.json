@@ -2,6 +2,11 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "ALL",
+      		"dependsOn": ["Kill Process", "Build GCC", "Run EXE"],
+			"dependsOrder": "sequence"
+		},
+		{
 			"label": "Kill and Build",
       		"dependsOn": ["Kill Process", "Build GCC"],
 			"dependsOrder": "sequence"

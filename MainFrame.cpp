@@ -5,6 +5,9 @@
 
 #include "Snake.hpp"
 #include "Arena.hpp"
+#include "DrawPane.hpp"
+
+#include "wx/sizer.h"
 
 MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
 {
@@ -14,26 +17,41 @@ MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
 
     SetFont(wxFont(16, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-    arenaOutput = new wxStaticText(this, wxID_ANY, "Example Text", wxPoint(0,0), wxSize(800, 800), wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
-    arenaOutput->IsDoubleBuffered();
 
-    CreateStatusBar();
+    if(IS_SYMBOL_DRAWING){
+        arenaOutput = new wxStaticText(this, wxID_ANY, "Example Text", wxPoint(0,0), wxSize(800, 800), wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+        arenaOutput->IsDoubleBuffered();
+        CreateStatusBar();
+    }else{
+        wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+        drawPane = new BasicDrawPane(panel);
+        sizer->Add(drawPane, 1, wxEXPAND);
+        panel->SetSizer(sizer);
+        panel->SetAutoLayout(true);
+        panel->IsDoubleBuffered();
+    }
 
-    // GAME
-    snake.snack = snake.generateSnack();
+        // GAME
+        snake.snack = snake.generateSnack();
 
-    timer = new wxTimer(this, wxID_ANY);
-    Bind(wxEVT_TIMER, &MainFrame::OnTick, this, timer->GetId());
-    timer->Start(GAME_TICK);
+        timer = new wxTimer(this, wxID_ANY);
+        Bind(wxEVT_TIMER, &MainFrame::OnTick, this, timer->GetId());
+        timer->Start(GAME_TICK);
 }
 
 void MainFrame::OnTick(wxTimerEvent &evt)
 {
     if (!snake.moveSnake()){
         timer->Stop();
+        wxMessageBox("Game Over!");
     }else{
-        wxString arenaString(Arena::drawArena(snake).c_str(), wxConvWhateverWorks);
-        arenaOutput->SetLabel(arenaString);
+        if(IS_SYMBOL_DRAWING){
+            wxString arenaString(Arena::drawArenaSymbols(snake).c_str(), wxConvWhateverWorks);
+            arenaOutput->SetLabel(arenaString);
+        }else{
+            int** arena = Arena::getArena(snake);
+            drawPane->paintNow(arena);
+        }
     }
 }
 

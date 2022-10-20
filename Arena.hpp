@@ -8,7 +8,9 @@
 class Arena
 {
 public:
-    static std::string drawArena(Snake snake);
+    static std::string drawArenaSymbols(Snake snake);
+    static int** getArena(Snake snake);
+    enum Type{BLANK, BORDER, SNAKE, SNACK};
 
 private:
     static char getBorder(int x, int y);

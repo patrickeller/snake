@@ -7,6 +7,7 @@ bool App::OnInit(){
     mainFrame->SetClientSize(800, 600);
     mainFrame->Center();
     //mainFrame->ShowFullScreen(true, wxFULLSCREEN_ALL);
+
     mainFrame->Show();
     return true;
 }

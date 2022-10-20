@@ -6,4 +6,6 @@
 #define ARENA_WIDTH 32
 #define ARENA_HEIGHT 20
 
-#define GAME_TICK 200
+#define GAME_TICK 120
+
+#define IS_SYMBOL_DRAWING false

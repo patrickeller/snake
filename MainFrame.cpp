@@ -12,6 +12,7 @@
 MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
 {
     wxPanel *panel = new wxPanel(this);
+    panel->SetBackgroundColour(wxColour(*wxBLACK));
 
     panel->Bind(wxEVT_CHAR_HOOK, &MainFrame::OnKeyEvent, this);
 
@@ -30,7 +31,6 @@ MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
         panel->SetAutoLayout(true);
         panel->IsDoubleBuffered();
     }
-
         // GAME
         snake.snack = snake.generateSnack();
 
@@ -50,7 +50,7 @@ void MainFrame::OnTick(wxTimerEvent &evt)
             arenaOutput->SetLabel(arenaString);
         }else{
             int** arena = Arena::getArena(snake);
-            drawPane->paintNow(arena);
+            drawPane->paintNow(arena, &snake);
         }
     }
 }

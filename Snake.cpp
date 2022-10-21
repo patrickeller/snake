@@ -6,33 +6,30 @@
 #include "Snake.hpp"
 #include "Position.hpp"
 
-
-
-
 void Snake::debug()
 {
-    //std::cout << "direction:" << std::endl;
-    //std::cout << "\tx:" << this->directionX << std::endl;
-    //std::cout << "\ty:" << this->directionY << std::endl;
-    //std::cout << "------" << std::endl;
-    //std::cout << "snack:" << std::endl;
-    //std::cout << "\tx:" << this->snack.x << std::endl;
-    //std::cout << "\ty:" << this->snack.y << std::endl;
-    //std::cout << "------" << std::endl;
-    // std::cout << "History:" << std::endl;
-    // for (Position c : this->history)
+    // std::cout << "direction:" << std::endl;
+    // std::cout << "\tx:" << this->directionX << std::endl;
+    // std::cout << "\ty:" << this->directionY << std::endl;
+    // std::cout << "------" << std::endl;
+    // std::cout << "snack:" << std::endl;
+    // std::cout << "\tx:" << this->snack.x << std::endl;
+    // std::cout << "\ty:" << this->snack.y << std::endl;
+    // std::cout << "------" << std::endl;
+    //  std::cout << "History:" << std::endl;
+    //  for (Position c : this->history)
     //{
-    //     std::cout << "\tx:" << c.x << std::endl;
-    //     std::cout << "\ty:" << c.y << std::endl;
-    //     std::cout << "\t------" << std::endl;
-    //}
+    //      std::cout << "\tx:" << c.x << std::endl;
+    //      std::cout << "\ty:" << c.y << std::endl;
+    //      std::cout << "\t------" << std::endl;
+    // }
 }
 
 Position Snake::generateSnack()
 {
     Position snack = Position(
-        (rand() % (ARENA_WIDTH - 1)) + 1,
-        (rand() % (ARENA_HEIGHT - 1)) + 1);
+        (rand() % (ARENA_WIDTH - 2)) + 1,
+        (rand() % (ARENA_HEIGHT - 2)) + 1);
 
     for (Position h : this->history)
     {
@@ -63,7 +60,7 @@ bool Snake::isBorderCrash()
 {
     Position head = this->history.back();
 
-    if (head.x == 1 || head.y == 1 || head.x == ARENA_WIDTH || head.y == ARENA_HEIGHT)
+    if (head.x == 0 || head.y == 0 || head.x == ARENA_WIDTH - 1 || head.y == ARENA_HEIGHT - 1)
         return true;
 
     return false;

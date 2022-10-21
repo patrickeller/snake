@@ -4,6 +4,8 @@
 
 #include "DrawPane.hpp"
 #include "Arena.hpp"
+#include "Snake.hpp"
+
 
 BasicDrawPane::BasicDrawPane(wxPanel *parent) : wxPanel(parent)
 {
@@ -19,7 +21,7 @@ BasicDrawPane::BasicDrawPane(wxPanel *parent) : wxPanel(parent)
 void BasicDrawPane::paintEvent(wxPaintEvent &evt)
 {
     wxPaintDC dc(this);
-    render(dc, nullptr);
+    render(dc, nullptr, nullptr);
 }
 
 /*
@@ -34,10 +36,10 @@ void BasicDrawPane::paintEvent(wxPaintEvent &evt)
  * paint events and calling Refresh() when a refresh is needed
  * will do the job.
  */
-void BasicDrawPane::paintNow(int **arena)
+void BasicDrawPane::paintNow(int **arena, Snake *snake)
 {
     wxClientDC dc(this);
-    render(dc, arena);
+    render(dc, arena, snake);
 }
 
 /*
@@ -45,31 +47,64 @@ void BasicDrawPane::paintNow(int **arena)
  * method so that it can work no matter what type of DC
  * (e.g. wxPaintDC or wxClientDC) is used.
  */
-void BasicDrawPane::render(wxDC &dc, int **arena)
+void BasicDrawPane::render(wxDC &dc, int **arena, Snake *snake)
 {
-    if (arena == nullptr)return;
-    //wxSize size = dc.GetSize();
+    if (arena == nullptr && snake == nullptr)
+        return;
+    wxSize panelSize = dc.GetSize();
 
-    int drawSize = 15;
+    wxSize roundedDrawSize = wxSize((int)panelSize.x / ARENA_WIDTH, (int)panelSize.y / ARENA_HEIGHT);
+
+    int drawSize = std::min(roundedDrawSize.x, roundedDrawSize.y);
+
+    int startX = (int)(panelSize.x - (drawSize * ARENA_WIDTH)) / 2;
+    int startY = (int)(panelSize.y - (drawSize * ARENA_HEIGHT)) / 2;
 
     dc.Clear();
-    dc.SetBrush(*wxBLACK_BRUSH);  
-    for (unsigned int y = 1; y <= ARENA_HEIGHT; y++)
+    for (unsigned int y = 0; y < ARENA_HEIGHT; y++)
     {
-        for (unsigned int x = 1; x <= ARENA_WIDTH; x++)
+        for (unsigned int x = 0; x < ARENA_WIDTH; x++)
         {
+            switch (arena[y][x])
+            {
+            case Arena::BORDER:
+                dc.SetPen(*wxBLACK_PEN);
+                dc.SetBrush(*wxBLACK_BRUSH);
+                break;
+            case Arena::SNACK:
+                dc.SetPen(*wxGREEN_PEN);
+                dc.SetBrush(*wxGREEN_BRUSH);
+                break;
+            case Arena::SNAKE:
+                dc.SetPen(*wxYELLOW_PEN);
+                dc.SetBrush(*wxYELLOW_BRUSH);
+                break;
+            }
             if (arena[y][x] != Arena::BLANK)
             {
-                dc.DrawRectangle(x*drawSize, y*drawSize, drawSize, drawSize);
+                dc.DrawRectangle((x * drawSize) + startX, (y * drawSize) + startY, drawSize, drawSize);
             }
         }
     }
 
-    for (int c = 1; c <= ARENA_HEIGHT; c++)
+    int textSize = (int) drawSize / 2;
+
+    wxFont font(textSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+    dc.SetFont(font);
+    dc.SetTextForeground(wxColour(255,255,255));
+
+    int textY = (int)(drawSize * (ARENA_HEIGHT - 1)) + drawSize / 4;
+    int snakeSore = snake->history.size();
+    wxString text = wxString::Format(wxT("Punkte: %i"), snakeSore);
+    dc.DrawText(text, startX + drawSize, textY);
+    
+
+    for (int c = 0; c < ARENA_HEIGHT; c++)
     {
-        if(arena[c] != nullptr){
-            delete [] arena[c];
+        if (arena[c] != nullptr)
+        {
+            delete[] arena[c];
         }
     }
-    delete [] arena;
+    delete[] arena;
 }

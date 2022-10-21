@@ -4,7 +4,7 @@
 #define KEY_DOWN 80
 
 #define ARENA_WIDTH 32
-#define ARENA_HEIGHT 20
+#define ARENA_HEIGHT 32
 
 #define GAME_TICK 120
 

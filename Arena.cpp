@@ -6,20 +6,19 @@
 #include "Snake.hpp"
 #include "Position.hpp"
 
-
 char Arena::getBorder(int x, int y)
 {
-    if (x == 1 && y == 1)
+    if (x == 0 && y == 0)
         return 201; //╔
-    if (x == ARENA_WIDTH && y == ARENA_HEIGHT)
+    if (x == ARENA_WIDTH - 1 && y == ARENA_HEIGHT - 1)
         return 188; //╝
-    if (x == ARENA_WIDTH && y == 1)
+    if (x == ARENA_WIDTH - 1 && y == 0)
         return 187; //╗
-    if (x == 1 && y == ARENA_HEIGHT)
+    if (x == 0 && y == ARENA_HEIGHT - 1)
         return 200; //╚
-    if (x == 1 || x == ARENA_WIDTH)
+    if (x == 0 || x == ARENA_WIDTH - 1)
         return 186; //║
-    if (y == 1 || y == ARENA_HEIGHT)
+    if (y == 0 || y == ARENA_HEIGHT - 1)
         return 205; //═
     return 32;
 }
@@ -38,9 +37,9 @@ std::string Arena::drawArenaSymbols(Snake snake)
 {
     char arena[(ARENA_HEIGHT * ARENA_WIDTH)];
     unsigned int arenaIndex = 0;
-    for (int y = 1; y <= ARENA_HEIGHT; ++y)
+    for (int y = 0; y < ARENA_HEIGHT; ++y)
     {
-        for (int x = 1; x <= ARENA_WIDTH; ++x)
+        for (int x = 0; x < ARENA_WIDTH; ++x)
         {
             char border = getBorder(x, y);
             if (border != 32)
@@ -65,21 +64,21 @@ std::string Arena::drawArenaSymbols(Snake snake)
         arenaIndex++;
     }
 
-    //std::cout << arena;
+    // std::cout << arena;
 
     std::string arenaString = arena;
     return arenaString;
 }
 
-int** Arena::getArena(Snake snake)
+int **Arena::getArena(Snake snake)
 {
-    int** arena = new int*[ARENA_HEIGHT+1];
-    for (int y = 1; y <= ARENA_HEIGHT; y++)
+    int **arena = new int *[ARENA_HEIGHT];
+    for (int y = 0; y < ARENA_HEIGHT; y++)
     {
-    
-        arena[y] = new int[ARENA_WIDTH+1];
 
-        for (int x = 1; x <= ARENA_WIDTH; x++)
+        arena[y] = new int[ARENA_WIDTH];
+
+        for (int x = 0; x < ARENA_WIDTH; x++)
         {
             char border = getBorder(x, y);
             if (border != 32)

@@ -23,14 +23,23 @@ char Arena::getBorder(int x, int y)
     return 32;
 }
 
-bool Arena::isSnakePixel(int x, int y, Snake snake)
+signed int Arena::getSnakePixel(int x, int y, Snake snake)
 {
-    for (Position c : snake.history)
+    for (int s = 0; s < snake.history.size(); s++)
     {
-        if (x == c.x && y == c.y)
-            return true;
+        if (x == snake.history[s].x && y == snake.history[s].y)
+        {
+            if (s % 4 == 0 || s % 4 == 3)
+            {
+                return SNAKE_LIGHT;
+            }
+            else
+            {
+                return SNAKE_DARK;
+            }
+        }
     }
-    return false;
+    return -1;
 }
 
 std::string Arena::drawArenaSymbols(Snake snake)
@@ -46,7 +55,7 @@ std::string Arena::drawArenaSymbols(Snake snake)
             {
                 arena[arenaIndex] = border;
             }
-            else if (isSnakePixel(x, y, snake))
+            else if (getSnakePixel(x, y, snake) != -1)
             {
                 arena[arenaIndex] = char(35);
             }
@@ -81,17 +90,19 @@ int **Arena::getArena(Snake snake)
         for (int x = 0; x < ARENA_WIDTH; x++)
         {
             char border = getBorder(x, y);
+            signed int snakePixel = getSnakePixel(x, y, snake);
+
             if (border != 32)
             {
                 arena[y][x] = BORDER;
             }
-            else if (isSnakePixel(x, y, snake))
+            else if (snakePixel >= 0)
             {
-                arena[y][x] = SNACK;
+                arena[y][x] = snakePixel;
             }
             else if (snake.snack.x == x && snake.snack.y == y)
             {
-                arena[y][x] = SNAKE;
+                arena[y][x] = SNACK;
             }
             else
             {

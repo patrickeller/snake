@@ -18,39 +18,48 @@ MainFrame::MainFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
 
     SetFont(wxFont(16, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-
-    if(IS_SYMBOL_DRAWING){
-        arenaOutput = new wxStaticText(this, wxID_ANY, "Example Text", wxPoint(0,0), wxSize(800, 800), wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+    if (IS_SYMBOL_DRAWING)
+    {
+        arenaOutput = new wxStaticText(this, wxID_ANY, "Example Text", wxPoint(0, 0), wxSize(800, 800), wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
         arenaOutput->IsDoubleBuffered();
         CreateStatusBar();
-    }else{
-        wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+    }
+    else
+    {
+        wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
         drawPane = new BasicDrawPane(panel);
         sizer->Add(drawPane, 1, wxEXPAND);
         panel->SetSizer(sizer);
         panel->SetAutoLayout(true);
         panel->IsDoubleBuffered();
     }
-        // GAME
-        snake.snack = snake.generateSnack();
+    // GAME
+    //Snake snake = *new Snake();
+    snake.snack = snake.generateSnack();
 
-        timer = new wxTimer(this, wxID_ANY);
-        Bind(wxEVT_TIMER, &MainFrame::OnTick, this, timer->GetId());
-        timer->Start(GAME_TICK);
+    timer = new wxTimer(this, wxID_ANY);
+    Bind(wxEVT_TIMER, &MainFrame::OnTick, this, timer->GetId());
+    timer->Start(GAME_TICK);
 }
 
 void MainFrame::OnTick(wxTimerEvent &evt)
 {
-    if (!snake.moveSnake()){
+    if (!snake.moveSnake())
+    {
         timer->Stop();
-        wxMessageBox("Game Over!");
-    }else{
-        if(IS_SYMBOL_DRAWING){
+        wxMessageBox(wxString::Format(wxT("Game Over!\nDein Score: %i"),snake.history.size()));
+    }
+    else
+    {
+        if (IS_SYMBOL_DRAWING)
+        {
             wxString arenaString(Arena::drawArenaSymbols(snake).c_str(), wxConvWhateverWorks);
             arenaOutput->SetLabel(arenaString);
-        }else{
-            int** arena = Arena::getArena(snake);
-            drawPane->paintNow(arena, &snake);
+        }
+        else
+        {
+            int **arena = Arena::getArena(snake);
+            drawPane->manualDraw(arena, &snake);
         }
     }
 }
@@ -59,8 +68,8 @@ void MainFrame::OnKeyEvent(wxKeyEvent &evt)
 {
     int keyCode = evt.GetKeyCode();
 
-    int xOffset = snake.history.end()[-1].x - snake.history.end()[-2].x;
-    int yOffset = snake.history.end()[-1].y - snake.history.end()[-2].y;
+    int xOffset = snake.history[0].x - snake.history[1].x;
+    int yOffset = snake.history[0].y - snake.history[1].y;
 
     switch (keyCode)
     {

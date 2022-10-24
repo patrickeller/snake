@@ -10,9 +10,9 @@ class Arena
 public:
     static std::string drawArenaSymbols(Snake snake);
     static int** getArena(Snake snake);
-    enum Type{BLANK, BORDER, SNAKE, SNACK};
+    enum Type{BLANK, BORDER, SNAKE_LIGHT, SNAKE_DARK, SNACK};
 
 private:
     static char getBorder(int x, int y);
-    static bool isSnakePixel(int x, int y, Snake snake);
+    static signed int getSnakePixel(int x, int y, Snake snake);
 };

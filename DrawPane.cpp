@@ -6,50 +6,50 @@
 #include "Arena.hpp"
 #include "Snake.hpp"
 
-
 BasicDrawPane::BasicDrawPane(wxPanel *parent) : wxPanel(parent)
 {
-    this->Bind(wxEVT_PAINT, paintEvent, this);
+    this->arenaBuffer = nullptr;
+    this->snakeScoreBuffer = 0;
+    this->Bind(wxEVT_PAINT, onPaint, this);
+    this->Bind(wxEVT_SIZE, onResize, this);
 }
 
-/*
- * Called by the system of by wxWidgets when the panel needs
- * to be redrawn. You can also trigger this call by
- * calling Refresh()/Update().
- */
-
-void BasicDrawPane::paintEvent(wxPaintEvent &evt)
+void BasicDrawPane::onPaint(wxPaintEvent &evt)
 {
     wxPaintDC dc(this);
-    render(dc, nullptr, nullptr);
+    render(dc, this->arenaBuffer, this->snakeScoreBuffer, true);
 }
 
-/*
- * Alternatively, you can use a clientDC to paint on the panel
- * at any time. Using this generally does not free you from
- * catching paint events, since it is possible that e.g. the window
- * manager throws away your drawing when the window comes to the
- * background, and expects you will redraw it when the window comes
- * back (by sending a paint event).
- *
- * In most cases, this will not be needed at all; simply handling
- * paint events and calling Refresh() when a refresh is needed
- * will do the job.
- */
-void BasicDrawPane::paintNow(int **arena, Snake *snake)
+void BasicDrawPane::onResize(wxSizeEvent &evt)
 {
     wxClientDC dc(this);
-    render(dc, arena, snake);
+    render(dc, arenaBuffer, snakeScoreBuffer, true);
 }
 
-/*
- * Here we do the actual rendering. I put it in a separate
- * method so that it can work no matter what type of DC
- * (e.g. wxPaintDC or wxClientDC) is used.
- */
-void BasicDrawPane::render(wxDC &dc, int **arena, Snake *snake)
+void BasicDrawPane::manualDraw(int **arena, Snake *snake)
 {
-    if (arena == nullptr && snake == nullptr)
+    wxClientDC dc(this);
+    render(dc, arena, snake->history.size(), false);
+
+    if (this->arenaBuffer != nullptr)
+    {
+        for (int c = 0; c < ARENA_HEIGHT; c++)
+        {
+            if (this->arenaBuffer[c] != nullptr)
+            {
+                delete[] this->arenaBuffer[c];
+            }
+        }
+        delete[] this->arenaBuffer;
+    }
+
+    this->arenaBuffer = arena;
+    this->snakeScoreBuffer = snake->history.size();
+}
+
+void BasicDrawPane::render(wxDC &dc, int **arena, int snakeScore, bool forceRewirte = false)
+{
+    if (arena == nullptr)
         return;
     wxSize panelSize = dc.GetSize();
 
@@ -60,51 +60,54 @@ void BasicDrawPane::render(wxDC &dc, int **arena, Snake *snake)
     int startX = (int)(panelSize.x - (drawSize * ARENA_WIDTH)) / 2;
     int startY = (int)(panelSize.y - (drawSize * ARENA_HEIGHT)) / 2;
 
-    dc.Clear();
+    if (forceRewirte)
+        dc.Clear();
+
     for (unsigned int y = 0; y < ARENA_HEIGHT; y++)
     {
         for (unsigned int x = 0; x < ARENA_WIDTH; x++)
         {
-            switch (arena[y][x])
+            if (forceRewirte == true || arenaBuffer == nullptr || (arena[y][x] != arenaBuffer[y][x]))
             {
-            case Arena::BORDER:
-                dc.SetPen(*wxBLACK_PEN);
-                dc.SetBrush(*wxBLACK_BRUSH);
-                break;
-            case Arena::SNACK:
-                dc.SetPen(*wxGREEN_PEN);
-                dc.SetBrush(*wxGREEN_BRUSH);
-                break;
-            case Arena::SNAKE:
-                dc.SetPen(*wxYELLOW_PEN);
-                dc.SetBrush(*wxYELLOW_BRUSH);
-                break;
-            }
-            if (arena[y][x] != Arena::BLANK)
-            {
+                switch (arena[y][x])
+                {
+                case Arena::BORDER:
+                    dc.SetPen(*wxBLACK_PEN);
+                    dc.SetBrush(*wxBLACK_BRUSH);
+                    break;
+                case Arena::SNACK:
+                    dc.SetPen(*wxYELLOW_PEN);
+                    dc.SetBrush(*wxYELLOW_BRUSH);
+                    break;
+                case Arena::SNAKE_LIGHT:
+                    dc.SetPen(wxPen(wxColor(144, 238, 144)));
+                    dc.SetBrush(wxBrush(wxColor(144, 238, 144)));
+                    break;
+                case Arena::SNAKE_DARK:
+                    dc.SetPen(wxPen(wxColor(0, 100, 0)));
+                    dc.SetBrush(wxBrush(wxColor(0, 100, 0)));
+                    break;
+                case Arena::BLANK:
+                    dc.SetPen(*wxWHITE_PEN);
+                    dc.SetBrush(*wxWHITE_BRUSH);
+                    break;
+                }
                 dc.DrawRectangle((x * drawSize) + startX, (y * drawSize) + startY, drawSize, drawSize);
             }
         }
     }
 
-    int textSize = (int) drawSize / 2;
-
-    wxFont font(textSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
-    dc.SetFont(font);
-    dc.SetTextForeground(wxColour(255,255,255));
-
-    int textY = (int)(drawSize * (ARENA_HEIGHT - 1)) + drawSize / 4;
-    int snakeSore = snake->history.size();
-    wxString text = wxString::Format(wxT("Punkte: %i"), snakeSore);
-    dc.DrawText(text, startX + drawSize, textY);
-    
-
-    for (int c = 0; c < ARENA_HEIGHT; c++)
+    if (forceRewirte == true || snakeScoreBuffer != 0 || snakeScore != snakeScoreBuffer)
     {
-        if (arena[c] != nullptr)
-        {
-            delete[] arena[c];
-        }
+        int textSize = (int)drawSize / 2;
+        wxFont font(textSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+        dc.SetFont(font);
+        dc.SetBackgroundMode(wxSOLID);
+        dc.SetTextForeground(wxColour(255, 255, 255));
+        dc.SetTextBackground(wxColour(0, 0, 0));
+
+        int textY = (int)(drawSize * (ARENA_HEIGHT - 1)) + drawSize / 4;
+        wxString text = wxString::Format(wxT("Punkte: %i"), snakeScoreBuffer);
+        dc.DrawText(text, startX + drawSize, textY);
     }
-    delete[] arena;
 }

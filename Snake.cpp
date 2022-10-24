@@ -58,7 +58,7 @@ bool Snake::isSelfCrash()
 
 bool Snake::isBorderCrash()
 {
-    Position head = this->history.back();
+    Position head = this->history.front();
 
     if (head.x == 0 || head.y == 0 || head.x == ARENA_WIDTH - 1 || head.y == ARENA_HEIGHT - 1)
         return true;
@@ -68,7 +68,7 @@ bool Snake::isBorderCrash()
 
 bool Snake::isSnackCrash()
 {
-    Position head = this->history.back();
+    Position head = this->history.front();
 
     if (head.x == this->snack.x && head.y == this->snack.y)
     {
@@ -82,14 +82,14 @@ bool Snake::isSnackCrash()
 
 bool Snake::moveSnake()
 {
-    this->history.push_back(Position(this->history.back().x + this->directionX, this->history.back().y + this->directionY));
+    this->history.insert(this->history.begin(), Position(this->history.front().x + this->directionX, this->history.front().y + this->directionY));
     if (isSnackCrash())
     {
         this->snack = generateSnack();
     }
     else
     {
-        this->history.erase(this->history.begin());
+        this->history.pop_back();
     }
     if (isSelfCrash() || isBorderCrash())
     {

@@ -28,7 +28,7 @@
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
-			"group": "build",
+			"group": "none",
 			"detail": "Kill running Process"
 		},
 		{
@@ -82,7 +82,7 @@
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
-			"group": "build",
+			"group": "none",
 			"detail": "exectue main.exe"
 		},
 		{

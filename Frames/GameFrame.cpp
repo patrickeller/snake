@@ -8,8 +8,7 @@
 #include "../Model/Arena.hpp"
 #include "../Model/DrawPane.hpp"
 
-
-GameFrame::GameFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
+GameFrame::GameFrame(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style, const wxString &name) : wxFrame(parent, id, title, pos, size, style, name)
 {
     wxPanel *panel = new wxPanel(this);
     panel->SetBackgroundColour(wxColour(*wxBLACK));
@@ -34,7 +33,7 @@ GameFrame::GameFrame(const wxString &title) : wxFrame(nullptr, wxID_ANY, title)
         panel->IsDoubleBuffered();
     }
     // GAME
-    //Snake snake = *new Snake();
+    // Snake snake = *new Snake();
     snake.snack = snake.generateSnack();
 
     timer = new wxTimer(this, wxID_ANY);
@@ -47,7 +46,8 @@ void GameFrame::OnTick(wxTimerEvent &evt)
     if (!snake.moveSnake())
     {
         timer->Stop();
-        wxMessageBox(wxString::Format(wxT("Game Over!\nDein Score: %i"),(int)snake.history.size()));
+        wxMessageBox(wxString::Format(wxT("Game Over!\nDein Score: %i"), (int)snake.history.size()));
+        Close();
     }
     else
     {

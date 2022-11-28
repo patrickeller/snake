@@ -3,11 +3,12 @@
 
 #include <wx/wx.h>
 
-bool App::OnInit(){
-    MainFrame* mainFrame = new MainFrame("Snake");
+bool App::OnInit()
+{
+    MainFrame *mainFrame = new MainFrame(nullptr);
     mainFrame->SetClientSize(800, 800);
     mainFrame->Center();
-    //mainFrame->ShowFullScreen(true, wxFULLSCREEN_ALL);
+    // mainFrame->ShowFullScreen(true, wxFULLSCREEN_ALL);
 
     mainFrame->Show();
     return true;
